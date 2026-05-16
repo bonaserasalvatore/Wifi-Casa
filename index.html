@@ -24,9 +24,19 @@
     padding:25px;
     border-radius:20px;
     text-align:center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
   }
 
-  button, a{
+  h2{
+    margin-top:0;
+  }
+
+  p{
+    margin:8px 0 15px 0;
+    opacity:0.85;
+  }
+
+  button{
     display:block;
     width:100%;
     padding:15px;
@@ -35,7 +45,12 @@
     border:none;
     font-size:16px;
     cursor:pointer;
-    text-decoration:none;
+    box-sizing:border-box;
+    transition:0.2s;
+  }
+
+  button:active{
+    transform:scale(0.98);
   }
 
   .copy{
@@ -57,6 +72,7 @@
     margin-top:15px;
     width:220px;
     border-radius:12px;
+    display:none;
   }
 </style>
 </head>
@@ -64,18 +80,17 @@
 <body>
 
 <div class="card">
-  <h2>Connettiti al WiFi</h2>
+  <h2>WiFi Access</h2>
 
   <p><b>SSID:</b> FRITZ!Box 7590 SL</p>
 
   <button class="copy" onclick="copyPassword()">Copia password</button>
 
-  <a class="wifi" href="App-Prefs:root=WIFI">Apri impostazioni WiFi</a>
+  <button class="wifi" onclick="openWifi()">Apri impostazioni WiFi</button>
 
   <button class="qr" onclick="toggleQR()">Mostra QR</button>
 
-  <img id="qr" style="display:none">
-
+  <img id="qr" alt="QR WiFi">
 </div>
 
 <script>
@@ -83,23 +98,41 @@
 const ssid = "FRITZ!Box 7590 SL";
 const password = "95963770202872562969";
 
-// copia password
+/* COPIA PASSWORD */
 function copyPassword(){
   navigator.clipboard.writeText(password);
   alert("Password copiata");
 }
 
-// QR WiFi
+/* APRI WIFI SETTINGS */
+function openWifi(){
+  const ua = navigator.userAgent;
+
+  if (/iPhone|iPad|iPod/i.test(ua)) {
+    // iOS shortcut (può variare in base alla versione)
+    window.location.href = "App-Prefs:root=WIFI";
+  } else {
+    // Android fallback
+    window.location.href = "intent://settings/#Intent;action=android.settings.WIFI_SETTINGS;end";
+  }
+}
+
+/* QR GENERATO DINAMICAMENTE */
 const qrUrl =
 "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
 encodeURIComponent(`WIFI:T:WPA;S:${ssid};P:${password};;`);
 
 document.getElementById("qr").src = qrUrl;
 
-// mostra/nasconde QR
+/* MOSTRA / NASCONDI QR */
 function toggleQR(){
   const qr = document.getElementById("qr");
-  qr.style.display = qr.style.display === "none" ? "block" : "none";
+
+  if(qr.style.display === "block"){
+    qr.style.display = "none";
+  } else {
+    qr.style.display = "block";
+  }
 }
 
 </script>
